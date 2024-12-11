@@ -14,17 +14,37 @@ const mg = mailgun.client({
     key: process.env.MAILGUN_API_KEY,
 });
 
-export const sendVerificationEmail = async (email: string, verificationLink: string) => {
+export const sendVerificationEmail = async (
+    email: string, 
+    link: string, 
+    type: 'verify-email' | 'set-password' = 'verify-email'
+) => {
+    const templates = {
+        'verify-email': {
+            subject: 'Verify Your Email Address',
+            buttonText: 'Verify Email Address',
+            title: 'Welcome to Our App!',
+            mainText: 'Please verify your email address by clicking the button below:',
+        },
+        'set-password': {
+            subject: 'Set Up Your Password',
+            buttonText: 'Set Password',
+            title: 'Complete Your Account Setup',
+            mainText: 'Please set up your password by clicking the button below:',
+        }
+    };
+
+    const template = templates[type];
 
     const msg = {
         to: `${email}`,
         from: `support@ai-signals.com`,
-        subject: 'Verify Your Email Address',
+        subject: template.subject,
         text: `
-            Welcome to Our App!
+            ${template.title}
             
-            Please verify your email address by clicking the link below:
-            ${verificationLink}
+            ${template.mainText}
+            ${link}
             
             This link will expire in 1 hour.
             
@@ -40,23 +60,23 @@ export const sendVerificationEmail = async (email: string, verificationLink: str
             margin: 0 auto; 
             background-color: #04091d; 
             padding: 20px;">
-            <h2 style="color: white;">Welcome to Our App!</h2>
+            <h2 style="color: white;">${template.title}</h2>
 
-            <p style="color: white;">Please verify your email address by clicking the button below:</p>
+            <p style="color: white;">${template.mainText}</p>
 
             <div style="text-align: center; margin: 30px 0;">
-                <a href="${verificationLink}" style="
+                <a href="${link}" style="
                         background-color: #1A6DF5; 
                         color: white; 
                         padding: 14px 28px; 
                         text-decoration: none; 
                         border-radius: 5px;
                         display: inline-block;">
-                    Verify Email Address
+                    ${template.buttonText}
                 </a>
             </div>
             <p style="color: #deebff;">Or copy and paste this link in your browser:</p>
-            <p style="color: #deebff; word-break: break-all;">${verificationLink}</p>
+            <p style="color: #deebff; word-break: break-all;">${link}</p>
             <p style="color: #deebff; font-size: 0.9em;">This link will expire in 1 hour.</p>
             <hr style="border: 1px solid #eee; margin: 20px 0;">
             <p style="color: #deebff; font-size: 0.8em;">
@@ -76,3 +96,5 @@ export const sendVerificationEmail = async (email: string, verificationLink: str
         throw error;
     }
 };
+
+

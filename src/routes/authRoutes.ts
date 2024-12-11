@@ -1,5 +1,5 @@
 import express, { Request, Response } from 'express';
-import { registerUser, verifyEmail, loginUser } from '../controllers/authController';
+import { registerUser, verifyEmail, loginUser, googleLogin, setPassword } from '../controllers/authController';
 
 const router = express.Router();
 
@@ -7,5 +7,6 @@ const router = express.Router();
 router.post('/register', registerUser);
 router.get('/verify-email', verifyEmail);
 router.post('/login', loginUser);
-
+router.post('/google-login', googleLogin);
+router.post('/set-password', setPassword);
 export default router;
