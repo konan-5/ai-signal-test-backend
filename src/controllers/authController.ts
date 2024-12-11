@@ -2,6 +2,7 @@ import jwt from 'jsonwebtoken';
 import { Request, Response } from 'express';
 import bcrypt from 'bcryptjs';
 import User from '../models/authModel';
+import { sendVerificationEmail } from '../utils/emailUtils';
 
 const generateVerificationToken = (email: string): string => {
     return jwt.sign({ email }, process.env.JWT_SECRET || 'secret', { expiresIn: '1h' });
@@ -40,8 +41,8 @@ export const registerUser = async (req: Request, res: Response): Promise<void> =
 
         const verificationLink = `${process.env.FRONTEND_URL}/verify-email?token=${verificationToken}`
 
-        console.log(newUser.email, verificationLink);
-
+        await sendVerificationEmail(email, verificationLink);
+        
         res.status(201).send('Registration successful. Please verify your email.');
     } catch (error) {
         console.error('Error registering user:', error);
