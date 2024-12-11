@@ -4,6 +4,7 @@ import dotenv from 'dotenv';
 import cors from 'cors';
 import authRoutes from './routes/authRoutes';
 import multer from 'multer';
+import protectedRoutes from './routes/protectedRoutes';
 
 dotenv.config();
 const upload = multer();
@@ -28,6 +29,7 @@ mongoose.connect(process.env.MONGO_URI || 'mongodb://localhost:27017/ai-signals'
   console.log('Error connecting to MongoDB', err);
 });
 
+app.use('/api', protectedRoutes);
 app.use('/api/auth', authRoutes);
 
 app.listen(3000, () => {

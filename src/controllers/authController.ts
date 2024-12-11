@@ -86,7 +86,8 @@ export const loginUser = async (req: Request, res: Response) => {
     try {
         const { email, password } = req.body;
 
-        const user = await User.findOne({ email });
+        const user = await User.findOne({ email })
+            .select('email password verification created_unix');
         if (!user) {
             res.status(400).send('Could not find user with this email.')
             return;
@@ -107,9 +108,16 @@ export const loginUser = async (req: Request, res: Response) => {
         }
 
         const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET || 'secret', { expiresIn: '1h' });
-        res.status(200).send(token);
+        // Return both token and user data
+        res.status(200).json({
+            token,
+            user: {
+                email: user.email,
+                created_unix: user.created_unix
+            }
+        });
     } catch (error) {
         console.error('Error during login:', error);
         res.status(500).send('An error occurred during login.');
-    }
+    }   
 };
